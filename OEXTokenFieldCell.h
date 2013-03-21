@@ -26,7 +26,7 @@
 /** Returns the attachment cell to be displayed for the given represented object.
  @param representedObject A represented object of the receiver.
  @return The attachment cell to be displayed for `representedObject`.
- @discussion The default implementation invokes `<tokenFieldCell:attachmentCellForRepresentedObject:>` on the receiver's delegate if the method is implemented. Otherwise it returns `nil`.
+ @discussion The default implementation invokes `<[OEXTokenFieldCellDelegate tokenFieldCell:attachmentCellForRepresentedObject:]>` on the receiver's delegate if the method is implemented. Otherwise it returns `nil`.
  */
 - (NSTextAttachmentCell *)attachmentCellForRepresentedObject:(id)representedObject;
 
