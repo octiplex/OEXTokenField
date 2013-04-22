@@ -42,6 +42,7 @@ static CGFloat const kOEXTokenAttachmentTokenMargin = 3;
 
 - (NSRect)titleRectForBounds:(NSRect)bounds
 {
+    bounds.size.width = MAX(bounds.size.width, kOEXTokenAttachmentTitleMargin * 2 + bounds.size.height);
     return NSInsetRect(bounds, kOEXTokenAttachmentTitleMargin + bounds.size.height / 2, 0);
 }
 
@@ -111,7 +112,9 @@ static CGFloat const kOEXTokenAttachmentTokenMargin = 3;
 - (void)drawTitleWithFrame:(NSRect)rect inView:(NSView *)controlView;
 {
     NSColor *textColor = [self tokenTitleColorForDrawingMode:self.tokenDrawingMode];
-    [self.stringValue drawInRect:rect withAttributes:@{NSFontAttributeName:self.font, NSForegroundColorAttributeName:textColor}];
+    NSMutableParagraphStyle *style = [NSMutableParagraphStyle new];
+    style.lineBreakMode = NSLineBreakByTruncatingTail;
+    [self.stringValue drawInRect:rect withAttributes:@{NSFontAttributeName:self.font, NSForegroundColorAttributeName:textColor, NSParagraphStyleAttributeName:style}];
 }
 
 #pragma mark - State
@@ -166,8 +169,12 @@ static CGFloat const kOEXTokenAttachmentTokenMargin = 3;
     }
 }
 
+#pragma mark - Geometry
+
 - (NSBezierPath *)tokenPathForBounds:(NSRect)bounds joinStyle:(OEXTokenJoinStyle)jointStyle
 {
+    bounds.size.width = MAX(bounds.size.width, kOEXTokenAttachmentTokenMargin * 2 + bounds.size.height);
+    
     CGFloat radius = bounds.size.height / 2;
     CGRect innerRect = NSInsetRect(bounds, kOEXTokenAttachmentTokenMargin + radius, 0);
     CGFloat x0 = NSMinX(bounds);
