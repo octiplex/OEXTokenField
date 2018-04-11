@@ -34,6 +34,9 @@ typedef NS_ENUM(NSUInteger, OEXTokenJoinStyle) {
 - (NSSize)cellSizeForTitleSize:(NSSize)titleSize;
 - (NSRect)titleRectForBounds:(NSRect)bounds;
 
+- (CGFloat)titleMargin;
+- (CGFloat)tokenMargin;
+
 - (void)drawTokenWithFrame:(NSRect)rect inView:(NSView *)controlView;
 - (void)drawTitleWithFrame:(NSRect)rect inView:(NSView *)controlView;
 

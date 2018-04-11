@@ -13,6 +13,8 @@
     NSMutableAttributedString *_string;
 }
 
+@dynamic delegate;
+
 #pragma mark - init
 
 - (id)initWithAttributedString:(NSAttributedString *)attrStr
@@ -51,8 +53,8 @@
 {
     [_string setAttributes:attrs range:range];
     NSTextAttachment *attachment = attrs[NSAttachmentAttributeName];
-    if ( attachment && [_delegate respondsToSelector:@selector(tokenTextStorage:updateTokenAttachment:forRange:)] )
-        [_delegate tokenTextStorage:self updateTokenAttachment:attachment forRange:range];
+    if ( attachment && [self.delegate respondsToSelector:@selector(tokenTextStorage:updateTokenAttachment:forRange:)] )
+        [self.delegate tokenTextStorage:self updateTokenAttachment:attachment forRange:range];
     [self edited:NSTextStorageEditedAttributes range:range changeInLength:0];
 }
 
@@ -69,9 +71,9 @@
     [_string replaceCharactersInRange:range withAttributedString:attrString];
     NSRange strRange = NSMakeRange(range.location, attrString.length);
     
-    [_string enumerateAttribute:NSAttachmentAttributeName inRange:strRange options:0 usingBlock:^(NSTextAttachment *attachment, NSRange range, BOOL *stop) {
-        if ( attachment && [_delegate respondsToSelector:@selector(tokenTextStorage:updateTokenAttachment:forRange:)] ) {
-            [_delegate tokenTextStorage:self updateTokenAttachment:attachment forRange:range];
+    [_string enumerateAttribute:NSAttachmentAttributeName inRange:strRange options:0 usingBlock:^(NSTextAttachment *attachment, NSRange arange, BOOL *stop) {
+        if ( attachment && [self.delegate respondsToSelector:@selector(tokenTextStorage:updateTokenAttachment:forRange:)] ) {
+            [self.delegate tokenTextStorage:self updateTokenAttachment:attachment forRange:arange];
         }
     }];
     [self edited:NSTextStorageEditedAttributes | NSTextStorageEditedCharacters range:range changeInLength:strRange.length - range.length];
