@@ -50,39 +50,44 @@ static CGFloat const kOEXTokenAttachmentTokenMargin = 3;
 
 - (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView characterIndex:(NSUInteger)charIndex layoutManager:(NSLayoutManager *)layoutManager
 {
-    _drawingMode = self.isHighlighted && controlView.window.isKeyWindow ? OEXTokenDrawingModeHighlighted : OEXTokenDrawingModeDefault;
-    _joinStyle = OEXTokenJoinStyleNone;
-    
-    if ( [controlView respondsToSelector:@selector(selectedRanges)] )
+  [self _drawWithFrame:cellFrame inView:controlView characterIndex:charIndex layoutManager:layoutManager];
+}
+
+- (void)_drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView characterIndex:(NSUInteger)charIndex layoutManager:(NSLayoutManager *)layoutManager
+{
+  _drawingMode = self.isHighlighted && controlView.window.isKeyWindow ? OEXTokenDrawingModeHighlighted : OEXTokenDrawingModeDefault;
+  _joinStyle = OEXTokenJoinStyleNone;
+
+  if ( [controlView respondsToSelector:@selector(selectedRanges)] )
+  {
+    for ( NSValue *rangeValue in [(id) controlView selectedRanges] )
     {
-        for ( NSValue *rangeValue in [(id) controlView selectedRanges] )
-        {
-            NSRange range = rangeValue.rangeValue;
-            if ( ! NSLocationInRange(charIndex, range) )
-                continue;
-            
-            if ( controlView.window.isKeyWindow )
-                _drawingMode = OEXTokenDrawingModeSelected;
-            
-            // TODO: RTL is not supported yet
-            if ( range.location < charIndex )
-                _joinStyle |= OEXTokenJoinStyleLeft;
-            if ( NSMaxRange(range) > charIndex + 1 )
-                _joinStyle |= OEXTokenJoinStyleRight;
-        }
+      NSRange range = rangeValue.rangeValue;
+      if ( ! NSLocationInRange(charIndex, range) )
+        continue;
+
+      if ( controlView.window.isKeyWindow )
+        _drawingMode = OEXTokenDrawingModeSelected;
+
+      // TODO: RTL is not supported yet
+      if ( range.location < charIndex )
+        _joinStyle |= OEXTokenJoinStyleLeft;
+      if ( NSMaxRange(range) > charIndex + 1 )
+        _joinStyle |= OEXTokenJoinStyleRight;
     }
-    
-    [self drawTokenWithFrame:cellFrame inView:controlView];
+  }
+
+  [self drawTokenWithFrame:cellFrame inView:controlView];
 }
 
 - (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
 {
-    [self drawWithFrame:cellFrame inView:controlView characterIndex:NSNotFound layoutManager:nil];
+    [self _drawWithFrame:cellFrame inView:controlView characterIndex:NSNotFound layoutManager:nil];
 }
 
 - (void)drawInteriorWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
 {
-    [self drawWithFrame:cellFrame inView:controlView characterIndex:NSNotFound layoutManager:nil];
+    [self _drawWithFrame:cellFrame inView:controlView characterIndex:NSNotFound layoutManager:nil];
 }
 
 - (void)drawTokenWithFrame:(NSRect)rect inView:(NSView *)controlView

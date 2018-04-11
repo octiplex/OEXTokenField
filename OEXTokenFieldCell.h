@@ -19,7 +19,7 @@
 /** The token field cell's delegate.
  @discussion The delegate must adopt the `<OEXTokenFieldCellDelegate>` protocol.
  */
-@property(nonatomic, assign) id <OEXTokenFieldCellDelegate> delegate;
+@property(weak) id<OEXTokenFieldCellDelegate, NSTokenFieldCellDelegate> delegate;
 
 /** @name Displaying Tokenized Attachment Cells */
 
