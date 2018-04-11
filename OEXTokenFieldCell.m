@@ -13,7 +13,7 @@
 
 static int kOEXTokenFieldCellRepresentedObjectKey;
 
-@interface OEXTokenFieldCell () <OEXTokenTextStorageDelegate>
+@interface OEXTokenFieldCell () <OEXTokenTextStorageDelegate, NSTextStorageDelegate>
 @end
 
 @implementation OEXTokenFieldCell
@@ -33,9 +33,9 @@ static int kOEXTokenFieldCellRepresentedObjectKey;
     
     NSAttributedString *attrString = super.attributedStringValue;
     NSRange range = NSMakeRange(0, attrString.length);
-    [attrString enumerateAttribute:NSAttachmentAttributeName inRange:range options:0 usingBlock:^(NSTextAttachment *attachment, NSRange range, BOOL *stop) {
+    [attrString enumerateAttribute:NSAttachmentAttributeName inRange:range options:0 usingBlock:^(NSTextAttachment *attachment, NSRange arange, BOOL *stop) {
         if ( attachment ) {
-            [self updateTokenAttachment:attachment forAttributedString:[attrString attributedSubstringFromRange:range]];
+            [self updateTokenAttachment:attachment forAttributedString:[attrString attributedSubstringFromRange:arange]];
         }
     }];
     return attrString;
@@ -48,8 +48,8 @@ static int kOEXTokenFieldCellRepresentedObjectKey;
     
     NSMutableArray *objects = [NSMutableArray new];
     NSRange range = NSMakeRange(0, attrString.length);
-    [attrString enumerateAttribute:NSAttachmentAttributeName inRange:range options:0 usingBlock:^(id attachment, NSRange range, BOOL *stop) {
-        id representedObject = [self representedObjectWithAttachment:attachment attributedString:[attrString attributedSubstringFromRange:range]];
+    [attrString enumerateAttribute:NSAttachmentAttributeName inRange:range options:0 usingBlock:^(id attachment, NSRange arange, BOOL *stop) {
+        id representedObject = [self representedObjectWithAttachment:attachment attributedString:[attrString attributedSubstringFromRange:arange]];
         [objects addObject:representedObject];
     }];
     

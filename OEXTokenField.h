@@ -21,7 +21,7 @@
 /** The token field's delegate.
  @discussion The delegate must adopt the `<OEXTokenFieldDelegate>` protocol.
  */
-@property(nonatomic, assign) id <OEXTokenFieldDelegate> delegate;
+@property (atomic, weak) id<OEXTokenFieldDelegate, NSTokenFieldDelegate> delegate;
 
 @end
 

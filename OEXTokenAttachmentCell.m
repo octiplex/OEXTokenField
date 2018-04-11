@@ -18,6 +18,17 @@ static CGFloat const kOEXTokenAttachmentTokenMargin = 3;
     OEXTokenJoinStyle   _joinStyle;
 }
 
+- (CGFloat)titleMargin
+{
+  return kOEXTokenAttachmentTitleMargin;
+}
+
+
+- (CGFloat)tokenMargin
+{
+  return kOEXTokenAttachmentTokenMargin;
+}
+
 #pragma mark - Geometry
 
 - (NSPoint)cellBaselineOffset
@@ -35,54 +46,60 @@ static CGFloat const kOEXTokenAttachmentTokenMargin = 3;
 {
     NSSize size = titleSize;
     // Add margins + height for the token rounded edges
-    size.width += size.height + kOEXTokenAttachmentTitleMargin * 2;
+    size.width += size.height + [self titleMargin] * 2;
     NSRect rect = {NSZeroPoint, size};
     return NSIntegralRect(rect).size;
 }
 
 - (NSRect)titleRectForBounds:(NSRect)bounds
 {
-    bounds.size.width = MAX(bounds.size.width, kOEXTokenAttachmentTitleMargin * 2 + bounds.size.height);
-    return NSInsetRect(bounds, kOEXTokenAttachmentTitleMargin + bounds.size.height / 2, 0);
+    CGFloat titleMargin = [self titleMargin];
+    bounds.size.width = MAX(bounds.size.width, titleMargin * 2 + bounds.size.height);
+    return NSInsetRect(bounds, titleMargin + bounds.size.height / 2, 0);
 }
 
 #pragma mark - Drawing
 
 - (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView characterIndex:(NSUInteger)charIndex layoutManager:(NSLayoutManager *)layoutManager
 {
-    _drawingMode = self.isHighlighted && controlView.window.isKeyWindow ? OEXTokenDrawingModeHighlighted : OEXTokenDrawingModeDefault;
-    _joinStyle = OEXTokenJoinStyleNone;
-    
-    if ( [controlView respondsToSelector:@selector(selectedRanges)] )
+  [self _drawWithFrame:cellFrame inView:controlView characterIndex:charIndex layoutManager:layoutManager];
+}
+
+- (void)_drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView characterIndex:(NSUInteger)charIndex layoutManager:(NSLayoutManager *)layoutManager
+{
+  _drawingMode = self.isHighlighted && controlView.window.isKeyWindow ? OEXTokenDrawingModeHighlighted : OEXTokenDrawingModeDefault;
+  _joinStyle = OEXTokenJoinStyleNone;
+
+  if ( [controlView respondsToSelector:@selector(selectedRanges)] )
+  {
+    for ( NSValue *rangeValue in [(id) controlView selectedRanges] )
     {
-        for ( NSValue *rangeValue in [(id) controlView selectedRanges] )
-        {
-            NSRange range = rangeValue.rangeValue;
-            if ( ! NSLocationInRange(charIndex, range) )
-                continue;
-            
-            if ( controlView.window.isKeyWindow )
-                _drawingMode = OEXTokenDrawingModeSelected;
-            
-            // TODO: RTL is not supported yet
-            if ( range.location < charIndex )
-                _joinStyle |= OEXTokenJoinStyleLeft;
-            if ( NSMaxRange(range) > charIndex + 1 )
-                _joinStyle |= OEXTokenJoinStyleRight;
-        }
+      NSRange range = rangeValue.rangeValue;
+      if ( ! NSLocationInRange(charIndex, range) )
+        continue;
+
+      if ( controlView.window.isKeyWindow )
+        _drawingMode = OEXTokenDrawingModeSelected;
+
+      // TODO: RTL is not supported yet
+      if ( range.location < charIndex )
+        _joinStyle |= OEXTokenJoinStyleLeft;
+      if ( NSMaxRange(range) > charIndex + 1 )
+        _joinStyle |= OEXTokenJoinStyleRight;
     }
-    
-    [self drawTokenWithFrame:cellFrame inView:controlView];
+  }
+
+  [self drawTokenWithFrame:cellFrame inView:controlView];
 }
 
 - (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
 {
-    [self drawWithFrame:cellFrame inView:controlView characterIndex:NSNotFound layoutManager:nil];
+    [self _drawWithFrame:cellFrame inView:controlView characterIndex:NSNotFound layoutManager:nil];
 }
 
 - (void)drawInteriorWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
 {
-    [self drawWithFrame:cellFrame inView:controlView characterIndex:NSNotFound layoutManager:nil];
+    [self _drawWithFrame:cellFrame inView:controlView characterIndex:NSNotFound layoutManager:nil];
 }
 
 - (void)drawTokenWithFrame:(NSRect)rect inView:(NSView *)controlView
@@ -173,10 +190,11 @@ static CGFloat const kOEXTokenAttachmentTokenMargin = 3;
 
 - (NSBezierPath *)tokenPathForBounds:(NSRect)bounds joinStyle:(OEXTokenJoinStyle)jointStyle
 {
-    bounds.size.width = MAX(bounds.size.width, kOEXTokenAttachmentTokenMargin * 2 + bounds.size.height);
+    CGFloat tokenMargin = [self tokenMargin];
+    bounds.size.width = MAX(bounds.size.width, tokenMargin * 2 + bounds.size.height);
     
     CGFloat radius = bounds.size.height / 2;
-    CGRect innerRect = NSInsetRect(bounds, kOEXTokenAttachmentTokenMargin + radius, 0);
+    CGRect innerRect = NSInsetRect(bounds, tokenMargin + radius, 0);
     CGFloat x0 = NSMinX(bounds);
     CGFloat x1 = NSMinX(innerRect);
     CGFloat x2 = NSMaxX(innerRect);
