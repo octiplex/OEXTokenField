@@ -18,6 +18,17 @@ static CGFloat const kOEXTokenAttachmentTokenMargin = 3;
     OEXTokenJoinStyle   _joinStyle;
 }
 
+- (CGFloat)titleMargin
+{
+  return kOEXTokenAttachmentTitleMargin;
+}
+
+
+- (CGFloat)tokenMargin
+{
+  return kOEXTokenAttachmentTokenMargin;
+}
+
 #pragma mark - Geometry
 
 - (NSPoint)cellBaselineOffset
@@ -35,15 +46,16 @@ static CGFloat const kOEXTokenAttachmentTokenMargin = 3;
 {
     NSSize size = titleSize;
     // Add margins + height for the token rounded edges
-    size.width += size.height + kOEXTokenAttachmentTitleMargin * 2;
+    size.width += size.height + [self titleMargin] * 2;
     NSRect rect = {NSZeroPoint, size};
     return NSIntegralRect(rect).size;
 }
 
 - (NSRect)titleRectForBounds:(NSRect)bounds
 {
-    bounds.size.width = MAX(bounds.size.width, kOEXTokenAttachmentTitleMargin * 2 + bounds.size.height);
-    return NSInsetRect(bounds, kOEXTokenAttachmentTitleMargin + bounds.size.height / 2, 0);
+    CGFloat titleMargin = [self titleMargin];
+    bounds.size.width = MAX(bounds.size.width, titleMargin * 2 + bounds.size.height);
+    return NSInsetRect(bounds, titleMargin + bounds.size.height / 2, 0);
 }
 
 #pragma mark - Drawing
@@ -178,10 +190,11 @@ static CGFloat const kOEXTokenAttachmentTokenMargin = 3;
 
 - (NSBezierPath *)tokenPathForBounds:(NSRect)bounds joinStyle:(OEXTokenJoinStyle)jointStyle
 {
-    bounds.size.width = MAX(bounds.size.width, kOEXTokenAttachmentTokenMargin * 2 + bounds.size.height);
+    CGFloat tokenMargin = [self tokenMargin];
+    bounds.size.width = MAX(bounds.size.width, tokenMargin * 2 + bounds.size.height);
     
     CGFloat radius = bounds.size.height / 2;
-    CGRect innerRect = NSInsetRect(bounds, kOEXTokenAttachmentTokenMargin + radius, 0);
+    CGRect innerRect = NSInsetRect(bounds, tokenMargin + radius, 0);
     CGFloat x0 = NSMinX(bounds);
     CGFloat x1 = NSMinX(innerRect);
     CGFloat x2 = NSMaxX(innerRect);
